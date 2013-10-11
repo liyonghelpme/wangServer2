@@ -5,9 +5,16 @@ from flaskext import *
 import json
 import time
 from util import *
+import random
 
 app = Flask(__name__)
 app.config.from_object("config")
+
+
+@app.after_request
+def afterQuest(response):
+    print (request.url, str(request.args), str(request.form) )
+    return response
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -26,16 +33,28 @@ def login():
     res = queryOne('select * from User where uid = %s', (uid))
     return jsonify(dict(uid=uid, builds=builds, serverTime=now, resource=res))
 
+@app.route('/finishBuild', methods=['POST'])
+def finishBuild():
+    uid = request.form.get("uid", None, type=int)
+    kind = request.form.get("kind", None, type=int)
+    px = request.form.get("px", None, type=int)
+    py = request.form.get("py", None, type=int)
+    bid = request.form.get("bid", None, type=int)
+    objectTime = request.form.get("objectTime", None, type=int)
+    update('insert into UserBuilding (uid, kind, px, py, bid, objectTime) value(%s, %s, %s, %s, %s, %s)', (uid, kind, px, py, bid, objectTime))
+    return jsonify(dict(code=1))
+
 @app.route('/harvestPlant', methods=['POST'])
 def harvestPlant():
     uid = request.form.get("uid", None, type=int)
     bid = request.form.get("bid", None, type=int)
+    pid = request.form.get("pid", None, type=int)
     gain = request.form.get("gain", None, type=str)
     gain = json.loads(gain)
     doGain(uid, gain)
     now = getTime()
-    update('update UserBuilding set objectTime = %s where uid = %s and bid = %s', (now, uid, bid))
-    return jsonify(dict(code=1))
+    update('update UserBuilding set objectTime = %s, objectId = %s where uid = %s and bid = %s', (now, pid, uid, bid))
+    return jsonify(dict(code=1, pid=pid))
 
 @app.route('/levelUp', methods=['POST'])
 def levelUp():
@@ -63,7 +82,10 @@ def harvestMine():
     update('update UserBuilding set objectTime = %s where uid = %s and bid = %s', (getTime(), uid, bid))
     return jsonify(dict(code=1))
     
-    
+@app.route('/initData', methods=['POST'])
+def initData():
+    s = queryAll('select * from strings')
+    return jsonify(dict(string=s))
 
 
 if __name__ == '__main__':
