@@ -158,8 +158,9 @@ def synBattleRes():
 @app.route('/rename', methods=['POST'])
 def rename():
     uid = request.form.get("uid", None, type=int)
-    name= request.form.get('name', None, type=str)
-    update('update User set name = %s where uid = %s', (name, uid))
+    name= request.form.get('name', None, type=unicode)
+    print("rename", uid, name)
+    update('update User set name = %s where uid = %s', (name.encode('utf8'), uid))
     return jsonify(dict(code=1))
     
 
