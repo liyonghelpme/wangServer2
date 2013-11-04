@@ -2,6 +2,7 @@ var createServer = require("http").createServer;
 var sys = require("sys");
 var url = require("url");
 var qs = require("querystring")
+/*
 var mysql = require("mysql");
 var pool = mysql.createPool({
  host:'127.0.0.1',
@@ -11,7 +12,7 @@ var pool = mysql.createPool({
  database: 'nozomi',
  insecureAuth:true,
 });
-
+*/
 if (!String.prototype.format) {
   String.prototype.format = function() {
     var args = arguments;
@@ -76,6 +77,7 @@ function createChannel(cid)
         return channel;
 
     function deleteMsg(msg) {
+    /*
         pool.getConnection(function(err, connection) {
             console.log("connection Error", err);
             connection.query(
@@ -86,6 +88,7 @@ function createChannel(cid)
             });
 
         });
+        */
     }
 
     var channel = new function() {
@@ -95,6 +98,7 @@ function createChannel(cid)
         var lastTime = 0;
         //异步的初始化channel 所以要等 channel 初始化结束了 才能返回数据
         function initMessage() {
+        /*
             pool.getConnection(function(err, connection) {
                 console.log("connection Error", err);
                 connection.query(
@@ -131,6 +135,7 @@ function createChannel(cid)
                 });
 
             });
+            */
         }
 
 
@@ -157,6 +162,7 @@ function createChannel(cid)
             else
                 lastTime = cur
             var m = [uid, name,  text, (cur - beginTime), type];
+            /*
             pool.getConnection(function(err, connection) {
                 console.log("connection Error", err);
                 connection.query(
@@ -167,6 +173,7 @@ function createChannel(cid)
                 });
 
             });
+            */
 
             messages.push(m);
             while(callbacks.length>0){
@@ -188,6 +195,7 @@ function createChannel(cid)
                 lastTime = cur;
             m = [0, type, info, cur-beginTime, "sys"];
 
+/*
             pool.getConnection(function(err, connection) {
                 console.log("connection Error", err);
                 connection.query(
@@ -198,6 +206,7 @@ function createChannel(cid)
                 });
 
             });
+            */
 
             messages.push(m);
             while(messages.length>100) {
@@ -225,7 +234,7 @@ function createChannel(cid)
             else
                 lastTime = cur;
             m = [uid, name, [space, max, []], (cur-beginTime), "request"];
-
+/*
             pool.getConnection(function(err, connection) {
                 console.log("connection Error", err);
                 connection.query(
@@ -236,6 +245,7 @@ function createChannel(cid)
                 });
 
             });
+            */
 
             messages.push(m);
             while(callbacks.length>0){
@@ -270,7 +280,7 @@ function createChannel(cid)
                     helps.push([uid, sid, slevel])
                     var m = messages[i];
                     console.log("doDonate", m);
-
+/*
                     pool.getConnection(function(err, connection) {
                         console.log("connection Error", err);
                         connection.query(
@@ -281,6 +291,7 @@ function createChannel(cid)
                         });
 
                     });
+                    */
 
                     var dm = [toUid, uid, property, (cur-beginTime), "donate"];
                     donates.push(dm);
