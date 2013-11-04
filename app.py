@@ -129,6 +129,16 @@ def campAddSol():
     update('update UserBuilding set objectTime = %s, objectList = %s where uid = %s and bid = %s', (objectTime, json.dumps(objectList), uid, bid))
     return jsonify(dict(code=1))
 
+@app.route('/getCertainOther', methods=['POST'])
+def getCertainOther():
+    uid = request.form.get("uid", None, type=int)
+    nuid = uid
+    now = int(time.time())
+    builds = queryAll('select * from UserBuilding where uid = %s', (nuid))
+    res = queryOne('select * from User where uid = %s', (nuid))
+    soldiers = queryAll('select * from UserSoldier where uid = %s', (nuid))
+    return jsonify(dict(code = 1, uid=nuid, builds=builds, serverTime=now, resource=res, soldiers=soldiers))
+    
 @app.route('/getRandomOther', methods=['POST'])
 def getRandomOther():
     uid = request.form.get("uid", None, type=int)
@@ -146,7 +156,7 @@ def getRandomOther():
     builds = queryAll('select * from UserBuilding where uid = %s', (nuid))
     res = queryOne('select * from User where uid = %s', (nuid))
     soldiers = queryAll('select * from UserSoldier where uid = %s', (nuid))
-    return jsonify(dict(code = 1, uid=uid, builds=builds, serverTime=now, resource=res, soldiers=soldiers))
+    return jsonify(dict(code = 1, uid=nuid, builds=builds, serverTime=now, resource=res, soldiers=soldiers))
 
 @app.route('/synBattleRes', methods=['POST'])
 def synBattleRes():
@@ -177,7 +187,7 @@ def killMonster():
     gain = json.loads(gain)
     util.doGain(uid, gain)
     return jsonify(dict(code=1))
-@app.route('/soldierDead', method=["POST"])
+@app.route('/soldierDead', methods=["POST"])
 def soldierDead():
     uid = request.form.get('uid', None, type=int)
     kind = request.form.get('kind', None, type=int)
@@ -191,4 +201,4 @@ def soldierDead():
     
 
 if __name__ == '__main__':
-    app.run(port=9000, host='0.0.0.0')
+    app.run(port=9002, host='0.0.0.0')
