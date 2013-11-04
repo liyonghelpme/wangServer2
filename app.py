@@ -19,6 +19,7 @@ def beforeRequest():
 @app.after_request
 def afterQuest(response):
     print (request.url, str(request.args), str(request.form) )
+    print("resp", response)
     return response
 
 @app.route('/login', methods=['POST'])
@@ -49,6 +50,12 @@ def finishBuild():
     py = request.form.get("py", None, type=int)
     bid = request.form.get("bid", None, type=int)
     objectTime = request.form.get("objectTime", None, type=int)
+    try:
+        cost = request.form.get('cost', None, type=str)
+        cost = json.loads(cost)
+        util.doCost(uid, cost)
+    except:
+        print("cost error")
     update('insert into UserBuilding (uid, kind, px, py, bid, objectTime) value(%s, %s, %s, %s, %s, %s)', (uid, kind, px, py, bid, objectTime))
     return jsonify(dict(code=1))
 
@@ -158,10 +165,30 @@ def synBattleRes():
 @app.route('/rename', methods=['POST'])
 def rename():
     uid = request.form.get("uid", None, type=int)
-    name= request.form.get('name', None, type=str)
-    update('update User set name = %s where uid = %s', (name, uid))
+    name= request.form.get('name', None, type=unicode)
+    print("rename", uid, name)
+    update('update User set name = %s where uid = %s', (name.encode('utf8'), uid))
     return jsonify(dict(code=1))
+
+@app.route('/killMonster', methods=['POST'])
+def killMonster():
+    uid = request.form.get('uid', None, type=int)
+    gain = request.form.get('gain', None, type=str)
+    gain = json.loads(gain)
+    util.doGain(uid, gain)
+    return jsonify(dict(code=1))
+@app.route('/soldierDead', methods=["POST"])
+def soldierDead():
+    uid = request.form.get('uid', None, type=int)
+    kind = request.form.get('kind', None, type=int)
+    update('update UserSoldier set num=num-1 where uid=%s and kind = %s', (uid, kind))
+    return jsonify(dict(code=1))
+
+   
+   
+
+
     
 
 if __name__ == '__main__':
-    app.run(port=9000, host='0.0.0.0')
+    app.run(port=9002, host='0.0.0.0')
